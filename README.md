@@ -37,13 +37,17 @@ Thousands of road accidents every year are caused by driver fatigue. Gig economy
 
 ```
 DriverSafe/
-├── phase1/
-│   ├── drivesafe_phase1.py       # MediaPipe EAR detection
-│   └── drivesafe_phase3.py       # EAR + CNN ensemble
-├── phase2/
-│   └── DriveSafe_Phase2.ipynb    # CNN training (Google Colab)
-├── models/
-│   └── drivesafe_float16.tflite  # Trained model — 513 KB
+├── ml/
+│   └── phases/
+│       ├── phase1/
+│       │   ├── drivesafe_phase1.py       # MediaPipe EAR detection
+│       │   └── drivesafe_phase3.py       # EAR + CNN ensemble
+│       ├── phase2/
+│       │   └── DriveSafe_Phase2.ipynb    # CNN training (Google Colab)
+│       ├── models/
+│       │   └── drivesafe_float16.tflite  # Trained model — 513 KB
+│       ├── requirements.txt
+│       └── README.md
 ├── lib/                          # Flutter app source
 │   ├── main.dart
 │   ├── theme.dart                # AppColors — light/dark
@@ -59,7 +63,7 @@ DriverSafe/
 │   ├── models/                   # TFLite model
 │   ├── audio/                    # Alarm sound
 │   └── icon/                     # App icon
-├── requirements.txt
+├── pubspec.yaml
 └── README.md
 ```
 
