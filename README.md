@@ -223,7 +223,7 @@ flutter run
 
 ## 👨‍💻 Author
 
-**Parth Kunkunkar**
+**Parth R. Kunkunkar**
 🔗 [LinkedIn](https://www.linkedin.com/in/parthkunkunkar/)
 ⭐ [GitHub](https://github.com/parthrkunkunkar-ds/DriverSafe)
 
