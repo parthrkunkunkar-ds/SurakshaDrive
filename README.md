@@ -1,19 +1,21 @@
-# 🚗 DriverSafe — Real-Time Driver Drowsiness Detection
+# 🛡️ SurakshaDrive — Driver Drowsiness Detection
 
+![Flutter](https://img.shields.io/badge/Flutter-3.29.3-blue?logo=flutter)
 ![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)
-![MediaPipe](https://img.shields.io/badge/MediaPipe-0.10.14-green)
-![OpenCV](https://img.shields.io/badge/OpenCV-4.10-red)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15-orange?logo=tensorflow)
-![Status](https://img.shields.io/badge/Status-Phase%203%20Complete-brightgreen)
-![Platform](https://img.shields.io/badge/Platform-Android-lightgrey?logo=android)
+![Android](https://img.shields.io/badge/Android-14-green?logo=android)
+![Status](https://img.shields.io/badge/Status-Phase%204A%20Complete-brightgreen)
 
-> A real-time driver drowsiness detection system built for gig economy drivers — Uber, Ola, Rapido — who drive long shifts with zero safety net. Runs **100% offline**. No internet required.
+> **Suraksha (सुरक्षा) = Safety in Hindi.**
+> A real-time driver drowsiness detection app built for Indian gig economy drivers — Uber, Ola, Rapido — who drive long shifts with zero safety net. Runs **100% offline**. No internet required.
 
 ---
 
 ## 🚨 The Problem
 
-Thousands of road accidents every year are caused by driver fatigue. Gig economy drivers often drive 10–12 hour shifts with no safety mechanism in place. DriverSafe aims to fix that with a lightweight, offline-first AI system that monitors driver alertness in real time.
+Thousands of road accidents every year are caused by driver fatigue. Gig economy drivers often drive 10–12 hour shifts with no safety mechanism in place. SurakshaDrive aims to fix that with a lightweight, offline-first AI system that monitors driver alertness in real time.
+
+> *Previously known as DriveSafe — renamed to SurakshaDrive to better connect with Indian drivers.*
 
 ---
 
@@ -22,9 +24,12 @@ Thousands of road accidents every year are caused by driver fatigue. Gig economy
 | Phase | Description | Status |
 |-------|-------------|--------|
 | **Phase 1** | MediaPipe + EAR algorithm — laptop webcam prototype | ✅ Complete |
-| **Phase 2** | Custom CNN training on MRL Eye Dataset (48,000 images) via Google Colab | ✅ Complete |
+| **Phase 2** | Custom CNN training on MRL Eye Dataset (48,000 images) | ✅ Complete |
 | **Phase 3** | MediaPipe + CNN ensemble — dual verification system | ✅ Complete |
-| **Phase 4** | Flutter Android app with TFLite — Play Store deployment | 🔄 In Progress |
+| **Phase 4A** | Flutter Android app — complete UI with all screens | ✅ Complete |
+| **Phase 4B** | CNN model integration into live camera feed | 🔄 In Progress |
+| **Phase 4C** | Google Maps integration + background service | ⏳ Upcoming |
+| **Phase 4D** | Play Store deployment | ⏳ Upcoming |
 
 ---
 
@@ -33,148 +38,141 @@ Thousands of road accidents every year are caused by driver fatigue. Gig economy
 ```
 DriverSafe/
 ├── phase1/
-│   ├── drivesafe_phase1.py       # MediaPipe EAR based detection
-│   └── drivesafe_phase3.py       # EAR + CNN ensemble system
+│   ├── drivesafe_phase1.py       # MediaPipe EAR detection
+│   └── drivesafe_phase3.py       # EAR + CNN ensemble
 ├── phase2/
-│   └── DriveSafe_Phase2.ipynb    # CNN training notebook (Google Colab)
+│   └── DriveSafe_Phase2.ipynb    # CNN training (Google Colab)
 ├── models/
-│   └── drivesafe_float16.tflite  # Trained model — TFLite export (513 KB)
-├── requirements.txt              # Dependencies
+│   └── drivesafe_float16.tflite  # Trained model — 513 KB
+├── lib/                          # Flutter app source
+│   ├── main.dart
+│   ├── theme.dart                # AppColors — light/dark
+│   └── screens/
+│       ├── splash_screen.dart
+│       ├── onboarding_screen.dart
+│       ├── main_screen.dart      # Bottom navigation
+│       ├── home_screen.dart      # Camera + EAR feed
+│       ├── alert_screen.dart     # जागो! रुको! alert
+│       ├── analytics_screen.dart
+│       └── settings_screen.dart
+├── assets/
+│   ├── models/                   # TFLite model
+│   ├── audio/                    # Alarm sound
+│   └── icon/                     # App icon
+├── requirements.txt
 └── README.md
 ```
 
 ---
 
-## ⚙️ Phase 1 — MediaPipe EAR Detection
+## 📱 Phase 4A — Flutter App
 
-Phase 1 runs entirely on a laptop webcam using **MediaPipe Face Mesh** and the **Eye Aspect Ratio (EAR)** algorithm.
+A complete Android app with production-ready UI built from scratch.
 
-```
-Webcam Frame → MediaPipe Face Mesh (468 landmarks) → Extract 6 Eye Points → Compute EAR → Threshold Check → Alarm
-```
+### Screens
 
-### Eye Aspect Ratio (EAR)
+| Screen | Description |
+|--------|-------------|
+| **Splash** | Animated eye logo with warm glow |
+| **Onboarding** | 4 slides — AI detection, privacy, alerts, battery |
+| **Home** | Live camera feed, EAR value, Connect with Maps |
+| **Alert** | Full red screen — जागो! रुको! + vibration + alarm |
+| **Analytics** | Session history, drive time, avg EAR |
+| **Settings** | Dark mode, EAR sensitivity, language, sound/vibration |
 
-```
-EAR = (‖p2−p6‖ + ‖p3−p5‖) / (2 × ‖p1−p4‖)
-```
+### Design System
 
-- EAR ≈ **0.30** → eyes open
-- EAR ≈ **0.0** → eyes closed
-- If EAR stays below **0.25** for **48 consecutive frames (~2 seconds)** → drowsiness detected
+| Property | Value |
+|----------|-------|
+| Primary color | Saffron `#FF9500` |
+| Light background | `#F2F2F7` |
+| Dark background | `#1C1C1E` slate |
+| Card surface | `#FFFFFF` / `#2C2C2E` |
+| Safe color | `#30D158` green |
+| Alert color | `#FF453A` red |
+| Font | Inter (Google Fonts) |
 
-### On Detection:
-- 🔔 Loud audio alarm triggers instantly
-- 🚨 Full-screen **"DROWSY! PULL OVER!"** warning appears
-- System resets automatically once eyes reopen
+### Features
+- ✅ Light mode default + instant dark mode toggle
+- ✅ Bottom navigation — Home, Alert, Analytics, Settings
+- ✅ Live front camera feed (3:4 ratio, rounded corners)
+- ✅ LIVE dot + FPS overlay on camera
+- ✅ जागो! रुको! full screen alert in Hindi
+- ✅ Looping alarm sound until dismissed
+- ✅ Continuous vibration pattern on alert
+- ✅ EAR sensitivity slider in settings
+- ✅ Hindi / English language toggle
+- ✅ 100% offline — no internet required
 
 ---
 
-## 🧠 Phase 2 — Custom CNN Model
-
-Phase 2 trains a custom Convolutional Neural Network on the **MRL Eye Dataset** using Google Colab's T4 GPU, then exports to TFLite for mobile deployment.
-
-### Dataset
-| Property | Value |
-|----------|-------|
-| Dataset | MRL Eye Dataset |
-| Total images | 48,000 |
-| Classes | `open_eye` / `closed_eye` |
-| Class balance | Perfectly balanced (24k each) |
-
-### Model Architecture
-- 4 Conv2D blocks with BatchNormalization + MaxPooling
-- GlobalAveragePooling2D
-- Dense(128) + Dropout(0.4)
-- Sigmoid output
-- Total parameters: **258,881** (~1MB)
-
-### Results
+## 🧠 Phase 2 — CNN Model Results
 
 | Metric | Result |
 |--------|--------|
+| Dataset | MRL Eye Dataset — 48,000 images |
 | Test Accuracy | **99.71%** |
 | Test AUC | **0.9999** |
-| Test Loss | **0.0103** |
 | Model size (TFLite float16) | **513 KB** |
-
-### Training Setup
-- Platform: Google Colab (T4 GPU)
-- Framework: TensorFlow 2.15
-- Epochs: 30
-- Batch size: 64
-- Best epoch: 25
+| Training platform | Google Colab T4 GPU |
+| Best epoch | 25 / 30 |
 
 ---
 
 ## 🔗 Phase 3 — EAR + CNN Ensemble
 
-Phase 3 combines both detection systems into a single real-time pipeline running at **30 FPS**.
-
 ```
 Webcam Frame
       ↓
-MediaPipe Face Mesh
+MediaPipe Face Mesh (468 landmarks)
       ↓
 Extract Eye Region
    ↙        ↘
 EAR          CNN Model (TFLite)
 Algorithm    513KB on-device
    ↓               ↓
-EAR < 0.25?   CNN < threshold?
+EAR < 0.20?   CNN < threshold?
    ↘        ↙
   Either triggers?
        ↓
   Alarm + Warning
 ```
 
-### Why Ensemble?
-- **EAR alone** — fast but sensitive to lighting and head angle
-- **CNN alone** — accurate but can miss partial closures
-- **Combined** — EAR catches geometric closure, CNN catches subtle drooping. Together they eliminate false positives significantly.
-
-### Live Overlay
-- `EAR: 0.291` — real-time eye aspect ratio
-- `CNN: 0.998` — real-time CNN confidence (1.0 = open, 0.0 = closed)
-- `Mode: Eyes Open / EAR only / CNN only / BOTH CLOSED`
-- Drowsy meter bar — fills up over 2 seconds before alarm fires
-- **30 FPS** on standard laptop CPU
+**Running at 30 FPS on laptop CPU. Zero false alarms after threshold tuning.**
 
 ---
 
-## 🛠️ Setup & Run
+## 🛠️ Setup
 
-### Prerequisites
-- Python 3.10
-- Webcam
-
-### Installation
+### Phase 1 — Laptop Webcam (VS Code)
 
 ```bash
-# Clone the repo
 git clone https://github.com/parthrkunkunkar-ds/DriverSafe.git
 cd DriverSafe
 
-# Create virtual environment
 py -3.10 -m venv .venv
-.venv\Scripts\activate        # Windows
-# source .venv/bin/activate   # Mac/Linux
+.venv\Scripts\activate
 
-# Install dependencies
 pip install opencv-python==4.10.0.84 mediapipe==0.10.14 numpy==1.26.4 pygame==2.6.1 tensorflow-cpu==2.15.0 protobuf==4.25.9
+
+python phase1/drivesafe_phase1.py   # Phase 1 — EAR only
+python phase1/drivesafe_phase3.py   # Phase 3 — EAR + CNN
 ```
 
-### Run Phase 1 (EAR only)
+### Phase 4 — Flutter Android App
+
 ```bash
-python phase1/drivesafe_phase1.py
+# Requirements: Flutter 3.29.3, Android Studio, Android phone
+
+cd DriverSafe
+flutter pub get
+flutter run
 ```
 
-### Run Phase 3 (EAR + CNN ensemble)
-```bash
-python phase1/drivesafe_phase3.py
-```
-
-Press **Q** to quit.
+**Prerequisites:**
+- Flutter 3.29.3
+- Android phone with Developer Mode enabled
+- USB Debugging on
 
 ---
 
@@ -182,14 +180,18 @@ Press **Q** to quit.
 
 | Tool | Purpose |
 |------|---------|
-| Python 3.10 | Core language |
+| Python 3.10 | Phase 1 & 3 — laptop detection |
 | MediaPipe 0.10.14 | Face mesh + landmark detection |
 | OpenCV 4.10 | Webcam capture + frame processing |
-| NumPy 1.26 | EAR math calculations |
-| Pygame | Audio alarm |
 | TensorFlow CPU 2.15 | TFLite inference |
-| TFLite float16 | On-device model (513 KB) |
-| Flutter *(Phase 4)* | Android app |
+| Flutter 3.29.3 | Android app framework |
+| Google Fonts (Inter) | Typography |
+| camera package | Front camera feed |
+| tflite_flutter | On-device CNN inference |
+| audioplayers | Alarm sound |
+| vibration | Haptic feedback |
+| shared_preferences | Settings persistence |
+| Google Colab T4 GPU | CNN model training |
 
 ---
 
@@ -200,14 +202,18 @@ Press **Q** to quit.
 | CNN Accuracy | > 95% | **99.71%** ✅ |
 | AUC | > 0.98 | **0.9999** ✅ |
 | Inference speed | 24+ fps | **30 FPS** ✅ |
-| Internet required | None | **None** ✅ |
 | Model size | < 1MB | **513 KB** ✅ |
+| Internet required | None | **None** ✅ |
 
 ---
 
 ## 🔭 What's Coming Next
 
-Phase 4 brings everything to Android via **Flutter + TFLite**. The same ensemble logic — MediaPipe face detection + CNN eye classification — will run entirely on the phone's front camera, with vibration + loud alarm on drowsiness detection. Target: Play Store deployment.
+**Phase 4B** — Wiring the 99.71% accurate CNN model into the live Flutter camera feed. Real drowsiness detection on Android.
+
+**Phase 4C** — Google Maps integration so drivers don't need to switch between apps. Background service so detection runs even when screen is off.
+
+**Phase 4D** — Play Store deployment.
 
 ---
 
@@ -215,7 +221,10 @@ Phase 4 brings everything to Android via **Flutter + TFLite**. The same ensemble
 
 **Parth Kunkunkar**
 🔗 [LinkedIn](https://www.linkedin.com/in/parthkunkunkar/)
+⭐ [GitHub](https://github.com/parthrkunkunkar-ds/DriverSafe)
 
 ---
 
 > *This is not a tutorial project. This is a real system being built for real drivers.*
+>
+> *Apni suraksha, apne haath — आपनी सुरक्षा, अपने हाथ*
