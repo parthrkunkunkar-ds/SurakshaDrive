@@ -6,7 +6,8 @@ import '../theme.dart';
 
 class AlertScreen extends StatefulWidget {
   final bool isActive;
-  const AlertScreen({super.key, this.isActive = false});
+  final VoidCallback? onDismiss;
+  const AlertScreen({super.key, this.isActive = false, this.onDismiss});
 
   @override
   State<AlertScreen> createState() => _AlertScreenState();
@@ -68,6 +69,7 @@ class _AlertScreenState extends State<AlertScreen>
     Vibration.cancel();
     await _audioPlayer.stop();
     setState(() => _alertActive = false);
+    widget.onDismiss?.call();
   }
 
   @override

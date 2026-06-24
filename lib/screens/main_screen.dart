@@ -14,21 +14,41 @@ class MainScreen extends StatefulWidget {
 
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
+  bool _alertActive = false;
 
-  final List<Widget> _screens = [
-    const HomeScreen(),
-    const AlertScreen(),
-    const AnalyticsScreen(),
-    const SettingsScreen(),
-  ];
+  void _triggerAlert() {
+    setState(() {
+      _alertActive = true;
+      _currentIndex = 1;
+    });
+  }
+
+  void _dismissAlert() {
+    setState(() {
+      _alertActive = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final screens = [
+      HomeScreen(onDrowsinessDetected: _triggerAlert),
+      AlertScreen(
+        isActive: _alertActive,
+        onDismiss: _dismissAlert,
+      ),
+      const AnalyticsScreen(),
+      const SettingsScreen(),
+    ];
+
     return Scaffold(
-      body: _screens[_currentIndex],
+      body: screens[_currentIndex],
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (i) => setState(() => _currentIndex = i),
+        onDestinationSelected: (i) {
+          if (i != 1) _dismissAlert();
+          setState(() => _currentIndex = i);
+        },
         backgroundColor: Theme.of(context).colorScheme.surface,
         indicatorColor: const Color(0xFFFF9500).withOpacity(0.15),
         destinations: [
@@ -39,17 +59,20 @@ class _MainScreenState extends State<MainScreen> {
           ),
           NavigationDestination(
             icon: const Icon(Icons.warning_amber_outlined),
-            selectedIcon: const Icon(Icons.warning_amber, color: Color(0xFFFF9500)),
+            selectedIcon:
+                const Icon(Icons.warning_amber, color: Color(0xFFFF9500)),
             label: 'Alert',
           ),
           NavigationDestination(
             icon: const Icon(Icons.bar_chart_outlined),
-            selectedIcon: const Icon(Icons.bar_chart, color: Color(0xFFFF9500)),
+            selectedIcon:
+                const Icon(Icons.bar_chart, color: Color(0xFFFF9500)),
             label: 'Analytics',
           ),
           NavigationDestination(
             icon: const Icon(Icons.settings_outlined),
-            selectedIcon: const Icon(Icons.settings, color: Color(0xFFFF9500)),
+            selectedIcon:
+                const Icon(Icons.settings, color: Color(0xFFFF9500)),
             label: 'Settings',
           ),
         ],
