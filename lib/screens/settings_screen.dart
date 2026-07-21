@@ -5,7 +5,8 @@ import '../main.dart';
 import '../theme.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  final VoidCallback? onSettingsChanged;
+  const SettingsScreen({super.key, this.onSettingsChanged});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();

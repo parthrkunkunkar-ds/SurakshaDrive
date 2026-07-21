@@ -7,7 +7,15 @@ import '../theme.dart';
 class AlertScreen extends StatefulWidget {
   final bool isActive;
   final VoidCallback? onDismiss;
-  const AlertScreen({super.key, this.isActive = false, this.onDismiss});
+  final bool soundEnabled;
+  final bool vibrationEnabled;
+  const AlertScreen({
+    super.key,
+    this.isActive = false,
+    this.onDismiss,
+    this.soundEnabled = true,
+    this.vibrationEnabled = true,
+  });
 
   @override
   State<AlertScreen> createState() => _AlertScreenState();
@@ -53,15 +61,19 @@ class _AlertScreenState extends State<AlertScreen>
 
   Future<void> _triggerAlert() async {
     setState(() => _alertActive = true);
-    final hasVibrator = await Vibration.hasVibrator() ?? false;
-    if (hasVibrator) {
-      Vibration.vibrate(pattern: [0, 500, 200, 500, 200, 1000], repeat: 0);
-    }
-    try {
-      await _audioPlayer.setReleaseMode(ReleaseMode.loop);
-      await _audioPlayer.play(AssetSource('audio/alarm.mp3'));
-    } catch (e) {
-      debugPrint('Audio error: $e');
+   if (widget.vibrationEnabled) {
+  final hasVibrator = await Vibration.hasVibrator() ?? false;
+  if (hasVibrator) {
+    Vibration.vibrate(pattern: [0, 500, 200, 500, 200, 1000], repeat: 0);
+  }
+}
+if (widget.soundEnabled) {
+      try {
+        await _audioPlayer.setReleaseMode(ReleaseMode.loop);
+        await _audioPlayer.play(AssetSource('audio/alarm.mp3'));
+      } catch (e) {
+        debugPrint('Audio error: $e');
+      }
     }
   }
 

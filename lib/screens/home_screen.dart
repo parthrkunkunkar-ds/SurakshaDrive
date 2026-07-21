@@ -10,7 +10,8 @@ import '../services/cnn_service.dart';
 
 class HomeScreen extends StatefulWidget {
   final VoidCallback? onDrowsinessDetected;
-  const HomeScreen({super.key, this.onDrowsinessDetected});
+  final double earThreshold;
+  const HomeScreen({super.key, this.onDrowsinessDetected, this.earThreshold = 0.20});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -32,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int _noFaceFrameCount = 0;
   static const int _drowsyFrameThreshold = 36;
   static const int _noFaceFrameThreshold = 20;
-  static const double _earThreshold = 0.20;
+  double get _earThreshold => widget.earThreshold;
 
   int _frameCount = 0;
   DateTime _lastFpsTime = DateTime.now();

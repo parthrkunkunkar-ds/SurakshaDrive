@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'home_screen.dart';
 import 'alert_screen.dart';
 import 'analytics_screen.dart';
@@ -15,6 +15,24 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
   bool _alertActive = false;
+  double _earSensitivity = 0.20;
+  bool _alertSound = true;
+  bool _vibration = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadSettings();
+  }
+
+  Future<void> _loadSettings() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      _earSensitivity = prefs.getDouble('earSensitivity') ?? 0.20;
+      _alertSound = prefs.getBool('alertSound') ?? true;
+      _vibration = prefs.getBool('vibration') ?? true;
+    });
+  }
 
   void _triggerAlert() {
     setState(() {
@@ -32,13 +50,18 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     final screens = [
-      HomeScreen(onDrowsinessDetected: _triggerAlert),
+      HomeScreen(
+        onDrowsinessDetected: _triggerAlert,
+        earThreshold: _earSensitivity,
+      ),
       AlertScreen(
         isActive: _alertActive,
         onDismiss: _dismissAlert,
+        soundEnabled: _alertSound,
+        vibrationEnabled: _vibration,
       ),
       const AnalyticsScreen(),
-      const SettingsScreen(),
+      SettingsScreen(onSettingsChanged: _loadSettings),
     ];
 
     return Scaffold(
@@ -47,6 +70,7 @@ class _MainScreenState extends State<MainScreen> {
         selectedIndex: _currentIndex,
         onDestinationSelected: (i) {
           if (i != 1) _dismissAlert();
+          if (i == 0) _loadSettings();
           setState(() => _currentIndex = i);
         },
         backgroundColor: Theme.of(context).colorScheme.surface,
